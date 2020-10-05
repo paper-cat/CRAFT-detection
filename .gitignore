@@ -8,7 +8,7 @@
 
 
 # Ignore data directory
-data/
+data/*
 
 
 # User-specific stuff
