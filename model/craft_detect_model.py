@@ -5,8 +5,12 @@ from model.custom_layers import ConvBlock, UpsampleBlock
 
 
 class Craft(Model):
-    def __init__(self):
+    def __init__(self, map_num: int = 1):
         super(Craft, self).__init__()
+
+        assert map_num in [1, 2], "Map Num 은 1 아니면 2 여야함"
+
+        self.map_num = map_num
 
         self.conv_block1 = ConvBlock(64)
         self.conv_block2 = ConvBlock(128)
@@ -27,11 +31,7 @@ class Craft(Model):
         self.conv_last3 = Conv2D(16, 3, 1, padding='same', activation='relu', kernel_initializer='he_normal')
         self.conv_last4 = Conv2D(16, 1, 1, activation='relu')
 
-        # 2 for regional / affinity score
-        # self.conv_fcn = Conv2D(2,1,1, activation='sigmoid')
-
-        # 1 for only regional score
-        self.conv_fcn = Conv2D(1, 1, 1, activation='sigmoid')
+        self.conv_fcn = Conv2D(map_num, 1, 1, activation='sigmoid')
 
     @tf.function
     def call(self, x, training=None, mask=None):
@@ -59,5 +59,9 @@ class Craft(Model):
         x = self.conv_last4(x)
         x = self.conv_fcn(x)
 
-        x = tf.squeeze(x, axis=3)
+        if self.map_num == 1:
+            x = tf.squeeze(x, axis=3)
+        else:
+            pass
+
         return x
