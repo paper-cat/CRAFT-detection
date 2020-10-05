@@ -27,7 +27,7 @@
 
 .idea/*
 .idea
-idea/
+.idea/
 
 # Gradle
 .idea/**/gradle.xml
