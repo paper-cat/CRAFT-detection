@@ -70,4 +70,4 @@ def main(argv):
 
 if __name__ == "__main__":
     # main(sys.argv)
-    main(['build_data.py', 'naver-cord-small', 'naver-cord', 'char'])
+    main(['build_data.py', 'naver-cord', 'naver-cord', 'char'])

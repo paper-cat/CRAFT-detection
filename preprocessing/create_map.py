@@ -27,8 +27,9 @@ def build_regional_map(img_name: str, data: dict, data_route: str):
 
         try:
             empty_map[y1:y3, x1:x2] = gau_map
-        except IndexError:
+        except ValueError:
             print(img_name, " has problem when making regional map")
+            print(y1, y3, x1, x2)
 
     with open(data_route + '/map/' + img_name + '_region.pickle', 'wb') as f:
         pickle.dump(empty_map, f, pickle.HIGHEST_PROTOCOL)
