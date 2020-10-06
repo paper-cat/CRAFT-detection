@@ -1,50 +1,73 @@
 import os
 import sys
 import getopt
-from preprocessing.parse_annotation import parse_label_img, parse_naver_json
-from preprocessing.create_map import build_affinity_map, build_regional_map
+import re
 
-WIDTH = 512
-HEIGHT = 512
+import config
+from preprocessing.parse_annotation import parse_label_img, parse_naver_json
+from preprocessing.create_map import build_region_affinity_map, build_regional_map, save_resized_img
 
 
 def main(argv):
-    # build_data.py data-directory data-format char
-    print(argv)
+    # Run Arguments
+    # build_data.py / data-directory / data-format / char
 
     assert argv[2] in ['naver-cord', 'labelImg'], "Not correct data format"
     assert argv[3] in ['char', 'word'], "Box Unit as to be one of char or word"
 
     base_route = os.getcwd()
-
+    config.init()
     # File always have to be in a folder or train, test folder
 
     # 1. find correct data directory
     try:
         img_route = base_route + '/data/' + argv[1] + '/train/image/'
-        _ = os.listdir(img_route)
+        ann_route = base_route + '/data/' + argv[1] + '/train/annotation/'
+        img_list = [re.findall(r"^(.+)(?=\.)", x)[0] for x in os.listdir(img_route)]
 
     except FileNotFoundError:
         img_route = base_route + '/data/' + argv[1] + '/image/'
-        _ = os.listdir(img_route)
+        ann_route = base_route + '/data/' + argv[1] + '/annotation/'
+        img_list = [re.findall(r"^(.+)(?=\.)", x)[0] for x in os.listdir(img_route)]
 
-    # 2. Parsing Annotation file
+    # MAP creation pipeline
     if argv[2] == 'naver-cord':
-        parsed_data = parse_naver_json()
+        parsing = parse_naver_json
+
     elif argv[2] == 'labelImg':
-        parsed_data = parse_label_img()
+        parsing = parse_label_img
     else:
         raise ValueError("Annotation file format has to be one of 'naver-cord' or 'labelImg' ")
 
-    # 3. Setting on map, word can figure out affinity map
     if argv[3].lower() == 'char':
-        build_regional_map()
+        build_map = build_regional_map
     elif argv[3].lower() == 'word':
-        build_regional_map()
-        build_affinity_map()
+        build_map = build_region_affinity_map
     else:
         raise ValueError("Data Unit size has to be one of 'char' or 'word'")
 
+    for img in img_list:
+        # 2. Make data Directory
+        data_route = base_route + '/data/' + argv[1]
+        try:
+            os.mkdir(data_route + '/map')
+        except OSError:
+            pass
+        try:
+            os.mkdir(data_route + '/resized_img')
+        except OSError:
+            pass
+
+        # 3. Parsing Annotation file
+        refined_data = parsing(img_name=img, img_route=img_route, ann_route=ann_route)
+
+        # 4. Save Resized Image
+        save_resized_img(img, img_route, data_route=data_route)
+
+        # 5. Drawing HeatMap, will be saved in base_route/map/
+        build_map(img_name=img, data=refined_data, data_route=data_route)
+
 
 if __name__ == "__main__":
-    main(sys.argv)
+    # main(sys.argv)
+    main(['build_data.py', 'naver-cord-small', 'naver-cord', 'char'])
