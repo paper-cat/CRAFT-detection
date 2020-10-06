@@ -1,6 +1,6 @@
 # CRAFT-detection
 
-Implement CRAFT detection model from https://github.com/clovaai/CRAFT-pytorch as tensorflow
+Implement CRAFT detection model from https://github.com/clovaai/CRAFT-pytorch with tensorflow 2
 
 1. Using Receipt data with English from https://github.com/clovaai/cord
 - data with information as json file
