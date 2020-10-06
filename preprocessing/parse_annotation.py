@@ -9,7 +9,9 @@ def parse_naver_json(img_name: str, img_route: str, ann_route: str):
     with open(ann_route + img_name + '.json') as ann_file:
         ann_data = json.load(ann_file)
 
-    refined_data = dict([('text', None)])
+    refined_data = dict([('text', None),
+                         ('width', ann_data['meta']['image_size']['width']),
+                         ('height', ann_data['meta']['image_size']['height'])])
     refined_data['chars'] = []
 
     for box in ann_data['valid_line']:
@@ -22,7 +24,7 @@ def parse_naver_json(img_name: str, img_route: str, ann_route: str):
             char_counts = len(word_text) if len(word_text) > 0 else 1
 
             # split given word box into char boxes
-            char_width = round(int(word_pos['x2']) - int(word_pos['x1']) / char_counts, 2)
+            char_width = round((int(word_pos['x2']) - int(word_pos['x1'])) / char_counts, 2)
 
             assert char_width > 0, "Annotation Error, character length cannot be 0 or less"
 
