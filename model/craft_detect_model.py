@@ -1,7 +1,14 @@
 import tensorflow as tf
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Conv2D, MaxPooling2D
+import tensorflow.keras.backend as K
+from tensorflow.keras.optimizers import Adam
+
 from model.custom_layers import ConvBlock, UpsampleBlock
+
+physical_devices = tf.config.list_physical_devices('GPU')
+print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU')))
+tf.config.experimental.set_memory_growth(physical_devices[0], enable=True)
 
 
 class Craft(Model):
@@ -19,11 +26,10 @@ class Craft(Model):
         self.conv_block5 = ConvBlock(512)
         self.conv_block6 = ConvBlock(512, last=True)
 
-        self.upsample_block1 = UpsampleBlock(1024)
-        self.upsample_block2 = UpsampleBlock(512)
-        self.upsample_block3 = UpsampleBlock(256)
-        self.upsample_block4 = UpsampleBlock(128)
-        self.upsample_block5 = UpsampleBlock(64, True)
+        self.upsample_block1 = UpsampleBlock(512)
+        self.upsample_block2 = UpsampleBlock(256)
+        self.upsample_block3 = UpsampleBlock(128)
+        self.upsample_block4 = UpsampleBlock(64, True)
 
         # Classification block
         self.conv_last1 = Conv2D(32, 3, 1, padding='same', activation='relu', kernel_initializer='he_normal')
@@ -51,7 +57,7 @@ class Craft(Model):
         x = self.upsample_block3(x)
 
         x = tf.concat([x, res1], axis=3)
-        x = self.upsample_block5(x)
+        x = self.upsample_block4(x)
 
         x = self.conv_last1(x)
         x = self.conv_last2(x)
@@ -65,3 +71,18 @@ class Craft(Model):
             pass
 
         return x
+
+    def compile_model(self):
+        if self.map_num == 1:
+            self.compile(Adam(lr=0.0001), eu_loss_region)
+        elif self.map_num == 2:
+            self.compile(Adam(lr=0.0001), eu_loss_both)
+
+
+def eu_loss_region(y_true, y_pred):
+    return K.sqrt(K.sum(K.square(y_true - y_pred), axis=-1))
+
+
+def eu_loss_both(y_true, y_pred):
+    return K.sqrt(K.sum(K.square(y_true[:, :, :, 0] - y_pred[:, :, :, 0]), axis=-1)) + \
+           K.sqrt(K.sum(K.square(y_true[:, :, :, 1] - y_pred[:, :, :, 1]), axis=-1))

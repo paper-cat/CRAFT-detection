@@ -1,7 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, UpSampling2D
-from tensorflow.keras.layers import BatchNormalization, Dropout
+from tensorflow.keras.layers import BatchNormalization
 
 
 class ConvBlock(tf.keras.layers.Layer):
@@ -27,12 +27,10 @@ class ConvBlock(tf.keras.layers.Layer):
         self.maxpool = MaxPooling2D()
         self.last = last
 
-    def build(self, input_shape):
-        pass
-
     def call(self, inputs, **kwargs):
         x = self.conv1(inputs)
         x = self.conv2(x)
+
         if self.last is False:
             x = self.maxpool(x)
             return x
@@ -47,6 +45,7 @@ class UpsampleBlock(tf.keras.layers.Layer):
     Up sizing image which is convoluted by ConvBlock
 
     """
+
     def __init__(self, units=64, last=False):
         super(UpsampleBlock, self).__init__()
 
