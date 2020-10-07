@@ -12,7 +12,7 @@ data/naver-cord
 dev_test.py
 
 pre_trained/*
-pre_trained/naver-cord_1/
+!pre_trained/example_model/*
 
 
 # User-specific stuff
