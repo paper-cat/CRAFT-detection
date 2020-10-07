@@ -9,6 +9,7 @@
 
 # Ignore data directory
 data/naver-cord
+dev_test.py
 
 
 # User-specific stuff
