@@ -1,0 +1,1 @@
+pre_trained/saved_model_name/best_model_checkpoint.index or data
