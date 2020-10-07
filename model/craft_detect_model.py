@@ -1,8 +1,9 @@
 import tensorflow as tf
 from tensorflow.keras.models import Model
-from tensorflow.keras.layers import Conv2D, MaxPooling2D
-import tensorflow.keras.backend as K
+from tensorflow.keras.layers import Conv2D
+import tensorflow.keras.backend as kb
 from tensorflow.keras.optimizers import Adam
+import numpy as np
 
 from model.custom_layers import ConvBlock, UpsampleBlock
 
@@ -12,12 +13,14 @@ tf.config.experimental.set_memory_growth(physical_devices[0], enable=True)
 
 
 class Craft(Model):
-    def __init__(self, map_num: int = 1):
+    def __init__(self, config, map_num: int = 1):
         super(Craft, self).__init__()
 
         assert map_num in [1, 2], "Map Num 은 1 아니면 2 여야함"
 
         self.map_num = map_num
+        self.epochs = config.epochs
+        self.batch_size = config.batch_size
 
         self.conv_block1 = ConvBlock(64)
         self.conv_block2 = ConvBlock(128)
@@ -74,15 +77,26 @@ class Craft(Model):
 
     def compile_model(self):
         if self.map_num == 1:
-            self.compile(Adam(lr=0.0001), eu_loss_region)
+            self.compile(Adam(lr=0.0002), eu_loss_region)
         elif self.map_num == 2:
-            self.compile(Adam(lr=0.0001), eu_loss_both)
+            self.compile(Adam(lr=0.0002), eu_loss_both)
+
+    # @tf.function
+    def train_model(self, train_x, train_y, test_x, test_y, save_route=None):
+
+        cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=save_route+'best_model',
+                                                         save_weights_only=True,
+                                                         verbose=1,
+                                                         monitor='val_loss')
+
+        self.fit(train_x, train_y, validation_data=(test_x, test_y),
+                 epochs=self.epochs, batch_size=self.batch_size, callbacks=[cp_callback])
 
 
 def eu_loss_region(y_true, y_pred):
-    return K.sqrt(K.sum(K.square(y_true - y_pred), axis=-1))
+    return kb.sqrt(kb.sum(kb.square(y_true - y_pred), axis=-1))
 
 
 def eu_loss_both(y_true, y_pred):
-    return K.sqrt(K.sum(K.square(y_true[:, :, :, 0] - y_pred[:, :, :, 0]), axis=-1)) + \
-           K.sqrt(K.sum(K.square(y_true[:, :, :, 1] - y_pred[:, :, :, 1]), axis=-1))
+    return kb.sqrt(kb.sum(kb.square(y_true[:, :, :, 0] - y_pred[:, :, :, 0]), axis=-1)) + \
+           kb.sqrt(kb.sum(kb.square(y_true[:, :, :, 1] - y_pred[:, :, :, 1]), axis=-1))

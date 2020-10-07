@@ -10,6 +10,8 @@
 # Ignore data directory
 data/naver-cord
 dev_test.py
+!pre_trained/naver-cord_1/*
+pre_trained/*
 
 
 # User-specific stuff
