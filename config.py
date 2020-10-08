@@ -20,4 +20,4 @@ def init():
     map_height = int(height / 2)
 
     epochs = 100
-    batch_size = 2
+    batch_size = 4
