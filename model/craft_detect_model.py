@@ -77,17 +77,18 @@ class Craft(Model):
 
     def compile_model(self):
         if self.map_num == 1:
-            self.compile(Adam(lr=0.0002), eu_loss_region)
+            self.compile(Adam(lr=0.0001), eu_loss_region)
         elif self.map_num == 2:
-            self.compile(Adam(lr=0.0002), eu_loss_both)
+            self.compile(Adam(lr=0.0001), eu_loss_both)
 
     # @tf.function
     def train_model(self, train_x, train_y, test_x, test_y, save_route=None):
 
-        cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=save_route+'best_model',
+        cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=save_route + 'best_model',
                                                          save_weights_only=True,
                                                          verbose=1,
-                                                         monitor='val_loss')
+                                                         monitor='val_loss',
+                                                         save_best_only=True)
 
         self.fit(train_x, train_y, validation_data=(test_x, test_y),
                  epochs=self.epochs, batch_size=self.batch_size, callbacks=[cp_callback])

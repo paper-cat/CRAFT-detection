@@ -1,6 +1,0 @@
-naver-cord_1 filter=lfs diff=lfs merge=lfs -text
-naver-cord_2 filter=lfs diff=lfs merge=lfs -text
-naver-cord_3 filter=lfs diff=lfs merge=lfs -text
-add_pretrained_here.txt filter=lfs diff=lfs merge=lfs -text
-example_model filter=lfs diff=lfs merge=lfs -text
-naver-cord_0 filter=lfs diff=lfs merge=lfs -text

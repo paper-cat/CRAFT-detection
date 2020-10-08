@@ -29,8 +29,8 @@ def main(argv):
                    os.listdir(map_route) if '_region' in x]
 
     # Load Affinity map
-    affinity_data = [np.asarray(cv2.imread(img_route + x)).astype(np.float32) for x in os.listdir(map_route) if
-                     '_affinity' in x]
+    affinity_data = [pickle.load(open(map_route + x, 'rb')).astype(np.float32) / 255 for x in
+                     os.listdir(map_route) if '_affinity' in x]
 
     # data split
     train_x, test_x, train_y, test_y = train_test_split(img_data, region_data,
@@ -45,7 +45,7 @@ def main(argv):
         except OSError:
             i += 1
 
-    save_route = 'pre_trained/' + argv[1] + '_' + str(i)+'/'
+    save_route = 'pre_trained/' + argv[1] + '_' + str(i) + '/'
 
     # init model
     craft_model = Craft(config=config, map_num=num_map)
@@ -58,7 +58,7 @@ def main(argv):
                             save_route=save_route)
 
     # Save Model
-    craft_model.save_weights(save_route, overwrite=False)
+    craft_model.save_weights(save_route + 'last_model', overwrite=False)
 
 
 if __name__ == "__main__":
