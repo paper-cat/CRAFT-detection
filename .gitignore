@@ -14,6 +14,7 @@ dev_test.py
 pre_trained/*
 !pre_trained/example_model/*
 !pre_trained/add_pretrained_here.txt
+!pre_trained/naver-cord_0/*
 
 
 # User-specific stuff
