@@ -33,19 +33,24 @@ def main(argv):
                      os.listdir(map_route) if '_affinity' in x]
 
     # data split
-    train_x, test_x, train_y, test_y = train_test_split(img_data, region_data,
-                                                        test_size=0.3, random_state=42)
+    if num_map == 1:
+        train_x, test_x, train_y, test_y = train_test_split(img_data, region_data,
+                                                            test_size=0.3, random_state=42)
+    else:
+        train_x, test_x, train_y, test_y = train_test_split(img_data, [np.stack([a, b], axis=2) for a, b in
+                                                                       zip(region_data, affinity_data)],
+                                                            test_size=0.3, random_state=42)
 
     # Create Pre-trained Directory
     i = 0
     while True:
         try:
-            os.mkdir('pre_trained/' + argv[1] + '_' + str(i))
+            os.mkdir('pre_trained/' + argv[1] + '_' + str(i) + '_' + argv[2])
             break
         except OSError:
             i += 1
 
-    save_route = 'pre_trained/' + argv[1] + '_' + str(i) + '/'
+    save_route = 'pre_trained/' + argv[1] + '_' + str(i) + '_' + argv[2] + '/'
 
     # init model
     craft_model = Craft(config=config, map_num=num_map)

@@ -19,5 +19,5 @@ def init():
     map_width = int(width / 2)
     map_height = int(height / 2)
 
-    epochs = 100
+    epochs = 10
     batch_size = 4

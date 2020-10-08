@@ -1,7 +1,6 @@
 import os
-import sys
-import getopt
 import re
+import tqdm
 
 import config
 from preprocessing.parse_annotation import parse_label_img, parse_naver_json
@@ -46,7 +45,8 @@ def main(argv):
     else:
         raise ValueError("Data Unit size has to be one of 'char' or 'word'")
 
-    for img in img_list:
+    print("Processing on Image...")
+    for img in tqdm.tqdm(img_list):
         # 2. Make data Directory
         data_route = base_route + '/data/' + argv[1]
         try:
@@ -70,4 +70,5 @@ def main(argv):
 
 if __name__ == "__main__":
     # main(sys.argv)
-    main(['build_data.py', 'naver-cord', 'naver-cord', 'char'])
+    # main(['build_data.py', 'naver-cord', 'naver-cord', 'char'])
+    main(['build_data.py', 'naver-cord', 'naver-cord', 'word'])
