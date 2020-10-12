@@ -25,7 +25,7 @@ def main(argv):
     map_num = 2 if 'word' in argv[0] else 1
 
     test_model = Craft(config=config, map_num=map_num)
-    test_model.load_weights(argv[0])
+    test_model.load_weights(argv[0]).expect_partial()
 
     result = test_model.predict(np.array([test_img]))
 
