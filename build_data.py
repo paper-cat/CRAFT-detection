@@ -3,8 +3,8 @@ import re
 import tqdm
 
 import config
-from preprocessing.parse_annotation import parse_label_img, parse_naver_json
-from preprocessing.create_map import build_region_affinity_map, build_regional_map, save_resized_img
+from utils.parse_annotation import parse_label_img, parse_naver_json
+from utils.create_map import build_region_affinity_map, build_regional_map, save_resized_img
 
 
 def main(argv):

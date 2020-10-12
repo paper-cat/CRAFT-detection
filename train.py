@@ -22,7 +22,7 @@ def main(argv):
     map_route = base_route + '/data/' + argv[1] + '/map/'
 
     # Load image data
-    img_data = [cv2.imread(img_route + x).astype(np.float32) for x in os.listdir(img_route)]
+    img_data = [np.array(cv2.imread(img_route + x).astype(np.float32)) / 255 for x in os.listdir(img_route)]
 
     # Load Region map
     region_data = [pickle.load(open(map_route + x, 'rb')).astype(np.float32) / 255 for x in
@@ -68,4 +68,4 @@ def main(argv):
 
 if __name__ == "__main__":
     # main(sys.argv)
-    main(['train.py', 'naver-cord', 'char'])
+    main(['train.py', 'naver-cord', 'word'])
