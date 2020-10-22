@@ -35,11 +35,20 @@ def main(argv):
         reg_map = np.array(result[0, :, :] * 255, np.uint8)
 
     if argv[2].lower() == 'char':
-        boxes = parse_region_map(reg_map, config.min_heat, min_char_size=7)
+
+        boxes = parse_region_map(reg_map, config.min_heat, min_char_size=10)
         result_img = draw_box(img=test_img, boxes=boxes)
-    else:
+
+        '''
         aff_map = np.array(result[0, :, :, 1] * 255, np.uint8)
-        result_img = parse_reg_aff_map(reg_map, aff_map)
+        boxes = parse_region_map(aff_map, config.min_heat, min_char_size=10)
+        result_img = draw_box(img=test_img, boxes=boxes)
+        '''
+    else:
+        # Word
+        aff_map = np.array(result[0, :, :, 1] * 255, np.uint8)
+        result_boxes = parse_reg_aff_map(reg_map, aff_map, config.min_heat, min_char_size=10)
+        result_img = draw_box(img=test_img, boxes=result_boxes)
 
     plt.imshow(result_img)
     plt.show()
@@ -48,6 +57,6 @@ def main(argv):
 if __name__ == "__main__":
     # main(sys.argv)
     # pre-trained_model / test_image_route / char or word
-    main(['pre_trained/naver-cord_3_word/best_model',
-          'data/naver-cord/resized_img/receipt_00003.jpg',
-          'char'])
+    main(['pre_trained/naver-cord_6_word/last_model',
+          'data/naver-cord/resized_img/receipt_00031.jpg',
+          'word'])

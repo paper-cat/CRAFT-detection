@@ -64,7 +64,7 @@ def build_affinity_map(img_name: str, data: dict, data_route: str):
     origin_width = data['width']
     origin_height = data['height']
 
-    # TODO : 기울어진 사각형을 어떻게 그려서 넣지?!?!?!? ... 일단 정형화된 (not tilted) 문서에 관해서만 구현
+    # TODO : 기울어진 사각형을 어떻게 그려서 넣지?!?!?!? = round() ... 일단 정형화된 (not tilted) 문서에 관해서만 구현
     for word in data['words']:
 
         prev_x = None
@@ -82,12 +82,14 @@ def build_affinity_map(img_name: str, data: dict, data_route: str):
             cur_y_bot = y1
 
             if prev_x is not None:
-                top_y = max(cur_y_top, prev_y_top)
-                bot_y = min(cur_y_bot, prev_y_bot)
+                top_y = min(cur_y_top, prev_y_top)
+                bot_y = max(cur_y_bot, prev_y_bot)
+                mean_y = int((top_y + bot_y) / 2)
+                half_height = int((top_y - mean_y) / 2)
 
                 try:
-                    gau_map = make_gaussian_map(top_y - bot_y, cur_x - prev_x)
-                    empty_map[bot_y:top_y, prev_x:cur_x] = gau_map
+                    gau_map = make_gaussian_map(2 * half_height, cur_x - prev_x)
+                    empty_map[mean_y - half_height: mean_y + half_height, prev_x:cur_x] = gau_map
                 except ValueError:
                     pass
 

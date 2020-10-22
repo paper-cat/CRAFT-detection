@@ -97,8 +97,65 @@ def parse_region_map(reg_map, min_heat, min_char_size):
     return boxes
 
 
-def parse_reg_aff_map(reg_map, aff_map):
-    pass
+def parse_reg_aff_map(reg_map, aff_map, min_heat, min_char_size):
+    region_boxes = parse_region_map(reg_map, min_heat, min_char_size)
+    aff_boxes = parse_region_map(aff_map, min_heat, min_char_size)
+
+    word_boxes = []
+
+    padding = 5
+
+    for aff_box in aff_boxes:
+        x_min = aff_box[0]
+        y_min = aff_box[1]
+        x_max = aff_box[2]
+        y_max = aff_box[3]
+
+        regs_in_aff = []
+        for reg_box in region_boxes:
+            if (x_min < (reg_box[0]+reg_box[2])/2 < x_max) and (y_min-padding < reg_box[1] < y_max+padding):
+            # if (reg_box[0] < x_min < reg_box[2]) and (reg_box[1]-padding < (y_min + y_max) / 2 < reg_box[3]+padding):
+                regs_in_aff.append(reg_box)
+
+            elif (x_min < (reg_box[0]+reg_box[2])/2 < x_max) and (y_min-padding < reg_box[3] < y_max+padding):
+            # elif (reg_box[0] < x_max < reg_box[2]) and (reg_box[1]-padding < (y_min + y_max) / 2 < reg_box[3]+padding):
+                regs_in_aff.append(reg_box)
+
+        for i, reg in enumerate(regs_in_aff):
+            found = False
+            for word in word_boxes:
+                if reg in word:
+                    found = True
+                    for temp in regs_in_aff:
+                        word.append(temp)
+                    break
+
+            if found is False and i == 0:
+                word_boxes.append(regs_in_aff)
+                break
+            elif found is False and i != 0:
+                word_boxes.append([reg])
+
+    for i, word in enumerate(word_boxes):
+        word_boxes[i] = list(set(tuple(temp) for temp in word))
+
+    combined_words = []
+
+    for word in word_boxes:
+        x_min, y_min, x_max, y_max = 100000, 1000000, 0, 0
+
+        for char in word:
+            x_min = char[0] if x_min > char[0] else x_min
+            x_max = char[2] if x_max < char[2] else x_max
+            y_min = char[1] if y_min > char[1] else y_min
+            y_max = char[3] if y_max < char[3] else y_max
+
+        combined_words.append((x_min, y_min, x_max, y_max))
+
+        # if len(combined_words) > 10:
+        #     break
+
+    return combined_words
 
 
 def draw_box(img, boxes):
