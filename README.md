@@ -10,9 +10,5 @@ For now, just working on structured text which is not tiled a lot
 - Both regional map and affinity map can be built  
 
 
-2. Using Business Registration (사업자 등록증) with Korean
-- No Labeling Data
-- To Use this data, need to label with labelImg
-
 ### Test Image
 ![reciept](/readme_images/Figure_1.png)
